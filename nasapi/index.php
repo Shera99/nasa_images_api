@@ -1,34 +1,5 @@
 <?php 
-//$date = Date('Y-n-j');
-$date = '2020-10-4';
-$url = 'https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?earth_date='.$date.'&api_key=8qJZd8AwTeDG7XycZwFbXQhHTK6VJBvuFpbwlqpt';
-
-$request = json_decode(file_get_contents($url));
-
-if (!empty($_COOKIE['IP']) && $_COOKIE['IP'] == $_SERVER["REMOTE_ADDR"]) {
-	if ($_COOKIE['date'] != $date) {
-		for($i = 0; $i < 5; $i++) {
-			$img = 'nasa_images/'.$request->photos[$i]->camera->name.'_'.$request->photos[$i]->camera->id.'_'.$request->photos[$i]->id.'.jpg';
-			copy($request->photos[$i]->img_src,$img);
-		}
-		createCookieDate($date);
-	}
-} else {
-	$cookie_name = 'IP';
-	$cookie_value = $_SERVER["REMOTE_ADDR"];
-	setcookie($cookie_name, $cookie_value, time() + (86400 * 30), "/");
-	createCookieDate($date);
-	for($i = 0; $i < 10; $i++) {
-			$img = 'nasa_images/'.$request->photos[$i]->camera->name.'_'.$request->photos[$i]->camera->id.'_'.$request->photos[$i]->id.'.jpg';
-			copy($request->photos[$i]->img_src,$img);
-		}
-	}
-
-	function createCookieDate($date) {
-		$cookie_name = 'date';
-		$cookie_value = $date;
-		setcookie($cookie_name, $cookie_value, time() + (86400 * 30), "/");
-	}
+require_once 'function.php';
 ?>
 
 <!DOCTYPE html>
