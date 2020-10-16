@@ -1,7 +1,10 @@
 <?php 
-require_once 'function.php';
-?>
 
+require_once 'function.php';
+
+$class = new NasaApi();
+
+?>
 <!DOCTYPE html>
 <html>
 <head>
