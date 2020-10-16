@@ -10,9 +10,7 @@
 			$this->date = date('Y-n-j');
 			
 			if (!empty($_COOKIE['IP']) && $_COOKIE['IP'] == $_SERVER["REMOTE_ADDR"]) {
-				if ($_COOKIE['date'] != $this->date) {
-					$this->nextOpen();
-				}
+				if ($_COOKIE['date'] != $this->date) $this->nextOpen();
 			} else {
 				$this->cookie_name = 'IP';
 				$this->cookie_value = $_SERVER["REMOTE_ADDR"];
@@ -33,19 +31,14 @@
 			for ($i = 0; $i < 5; $i++) {
 				$date1 = date('Y-n-j', strtotime("-".$i." day"));
 				$result = $this->query($date1);
-				if (count($result->photos) > 0) {
-					$this->copyImages($result->photos, 2, $date1);
-					echo 'firstOpen';
-				}
+				if (count($result->photos) > 0) $this->copyImages($result->photos, 2, $date1);
 			}
 		}
 
 		private function nextOpen() {
 			$result = $this->query($this->date);
-			if (count($result->photos) > 0) {
-				$this->copyImages($result->photos, 1, $this->date);
-				echo 'nextOpen';
-			}
+			if (count($result->photos) > 0) $this->copyImages($result->photos, 1, $this->date);
+			
 			$this->createCookieDate($this->date);
 		}
 
