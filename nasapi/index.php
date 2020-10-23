@@ -20,6 +20,7 @@ $class = new NasaApi();
 
 		<?php 
 			$handle = opendir(dirname(realpath(__FILE__)).'/nasa_images/');
+			$i = 1;
 			while($file = readdir($handle)){
 			  if($file !== '.' && $file !== '..'){
 					echo '
@@ -28,6 +29,8 @@ $class = new NasaApi();
 					  </div>
 					';
 				}
+				$i++;
+				if ($i == 10) break;
 			}
 		?>
 	  
