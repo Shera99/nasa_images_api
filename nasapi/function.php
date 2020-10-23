@@ -3,19 +3,33 @@
 	class NasaApi{
 
 		private $date;
-		private $cookie_name;
-		private $cookie_value;
+		private $file = 'json.txt';
+		private $jsonData;
 
 		public function __construct() {
 			$this->date = date('Y-n-j');
-			
-			if (!empty($_COOKIE['IP']) && $_COOKIE['IP'] == $_SERVER["REMOTE_ADDR"]) {
-				if ($_COOKIE['date'] != $this->date) $this->nextOpen();
+			$this->jsonData = $this->readFile();
+
+			if (!empty($this->jsonData['firstOpen'])) {
+				if ($this->jsonData['date'] !== $this->date) {
+					$this->nextOpen();
+				}
 			} else {
-				$this->cookie_name = 'IP';
-				$this->cookie_value = $_SERVER["REMOTE_ADDR"];
+				$this->jsonData['firstOpen'] = "open";
 				$this->firstOpen();
 			}
+			
+			$this->jsonData['date'] = $this->date;
+			$this->writeFile();
+		}
+
+		private function readFile() {
+			$data = json_decode(file_get_contents($this->file), TRUE);
+			return $data;
+		}
+
+		private function writeFile() {
+			file_put_contents($this->file, json_encode($this->jsonData));
 		}
 
 		private function query($date) {
@@ -25,34 +39,23 @@
 		}
 
 		private function firstOpen() {
-			setcookie($this->cookie_name, $this->cookie_value, time() + (86400 * 30), "/");
-			$this->createCookieDate($this->date);
-
 			for ($i = 0; $i < 5; $i++) {
 				$date1 = date('Y-n-j', strtotime("-".$i." day"));
 				$result = $this->query($date1);
-				if (count($result->photos) > 0) $this->copyImages($result->photos, 2, $date1);
+
+				if (count($result->photos) > 0) $this->copyImages($result->photos, $date1);
 			}
 		}
 
 		private function nextOpen() {
 			$result = $this->query($this->date);
-			if (count($result->photos) > 0) $this->copyImages($result->photos, 1, $this->date);
-			
-			$this->createCookieDate($this->date);
+
+			if (count($result->photos) > 0) $this->copyImages($result->photos, $this->date);
 		}
 
-		private function createCookieDate($date) {
-			$this->cookie_name = 'date';
-			$this->cookie_value = $date;
-			setcookie($this->cookie_name, $this->cookie_value, time() + (86400 * 30), "/");
-		}
-
-		private function copyImages($data, $n, $date) {
-			for($i = 0; $i < $n; $i++) {
-				$img = 'nasa_images/'.$data[$i]->camera->name.'_'.$data[$i]->camera->id.'_'.$data[$i]->id.'_'.$date.'.jpg';
-				copy($data[$i]->img_src,$img);
-			}
+		private function copyImages($data, $date) {
+				$img = 'nasa_images/'.$data[0]->camera->name.'_'.$data[0]->camera->id.'_'.$data[0]->id.'_'.$date.'.jpg';
+				copy($data[0]->img_src,$img);
 		}
 	}
 
